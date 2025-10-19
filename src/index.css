@@ -140,6 +140,10 @@
   }
 }
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @layer base {
   *, :after, :before, ::backdrop {
     box-sizing: border-box;
