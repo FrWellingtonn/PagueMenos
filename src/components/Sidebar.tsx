@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, FileText, History, Pill, BarChart3, Video, FileCheck, ShoppingCart, Cpu } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, History, Pill, BarChart3, Video, FileCheck, ShoppingCart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { MenuItem } from '../App';
 
@@ -17,7 +17,7 @@ export function Sidebar({ setActiveMenu }: SidebarProps) {
     { id: 'dsf' as MenuItem, label: 'Laudo DSF', icon: FileCheck, path: '/dsf' },
     { id: 'sales-history' as MenuItem, label: 'Histórico de Vendas', icon: ShoppingCart, path: '/sales-history' },
     { id: 'reports' as MenuItem, label: 'Relatórios', icon: BarChart3, path: '/reports' },
-    { id: 'api-example' as MenuItem, label: 'Exemplo API', icon: Cpu, path: '/api-example' },
+
   ];
 
   const navigate = useNavigate();
