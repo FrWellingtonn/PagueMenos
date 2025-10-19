@@ -23,13 +23,78 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
     {
       id: '1',
       type: 'ai',
-      content: 'Olá! Sou seu assistente de IA. Posso ajudar com informações sobre pacientes, histórico médico, medicamentos e vendas. Como posso ajudar?',
+      content: 'Olá! Sou seu assistente de IA powered by Amazon Nova Premier v1:0. Posso ajudar com informações sobre pacientes, histórico médico, medicamentos e vendas. Como posso ajudar?',
       timestamp: new Date()
     }
   ]);
+  const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
-  const generateAIResponse = (userMessage: string): string => {
+  const generateAIResponse = async (userMessage: string): Promise<string> => {
+    try {
+      // Preparar contexto do paciente se disponível
+      let patientContext = null;
+      if (patientCpf) {
+        const patient = mockPatients.find(p => p.cpf === patientCpf);
+        if (patient) {
+          const appointments = mockAppointments.filter(a => a.patientId === patient.id);
+          const medications = mockMedications.filter(m => m.patientId === patient.id);
+          const sales = mockSales.filter(s => s.patientCpf === patient.cpf);
+          
+          patientContext = {
+            patient: {
+              name: patient.name,
+              age: patient.age,
+              cpf: patient.cpf,
+              allergies: patient.allergies,
+              conditions: patient.conditions
+            },
+            appointments: appointments.map(a => ({
+              date: a.date,
+              type: a.type,
+              notes: a.notes
+            })),
+            medications: medications.map(m => ({
+              name: m.name,
+              dosage: m.dosage,
+              status: m.status
+            })),
+            sales: sales.map(s => ({
+              date: s.date,
+              products: s.products.map(p => p.name),
+              total: s.totalAmount
+            }))
+          };
+        }
+      }
+      
+      const response = await fetch('https://xzyrgf6hy7oxnukqbedda5xblq0omzrx.lambda-url.us-east-2.on.aws/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          patientContext: patientContext,
+          systemContext: 'Health Sharp - Sistema Clínico Farmacêutico'
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        return data.response || data.perguntas?.join('\n\n') || 'Desculpe, não consegui processar sua solicitação.';
+      } else {
+        console.error('Erro HTTP:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Erro na API:', error);
+    }
+    
+    // Fallback para resposta local se API falhar
+    return generateLocalResponse(userMessage);
+  };
+
+  const generateLocalResponse = (userMessage: string): string => {
     const message = userMessage.toLowerCase();
     
     // Buscar paciente por CPF se fornecido
@@ -122,10 +187,10 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
     }
 
     // Resposta padrão
-    return 'Posso ajudar com:\n• Histórico de atendimentos\n• Medicamentos e interações\n• Histórico de vendas\n• Alergias e condições de saúde\n\nInforme o CPF do paciente ou faça uma pergunta específica.';
+    return '**Health Sharp AI Assistant** \n*Powered by Amazon Nova Premier v1:0*\n\nPosso ajudar com:\n• Histórico de atendimentos\n• Medicamentos e interações\n• Histórico de vendas\n• Alergias e condições de saúde\n\nInforme o CPF do paciente ou faça uma pergunta específica.';
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
     const userMessage: Message = {
@@ -135,15 +200,28 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
       timestamp: new Date()
     };
 
-    const aiResponse: Message = {
-      id: (Date.now() + 1).toString(),
-      type: 'ai',
-      content: generateAIResponse(inputValue),
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage, aiResponse]);
+    setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue('');
+
+    try {
+      const aiResponseContent = await generateAIResponse(currentInput);
+      const aiResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: aiResponseContent,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: 'Desculpe, ocorreu um erro ao processar sua mensagem.',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    }
   };
 
   return (
@@ -151,7 +229,10 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
           <Bot className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold">Assistente IA</h3>
+          <div>
+            <h3 className="font-semibold">Health Sharp AI</h3>
+            <p className="text-xs text-gray-500">Amazon Nova Premier v1:0</p>
+          </div>
         </div>
         <Button variant="ghost" size="sm" onClick={onClose}>
           <X className="w-4 h-4" />
@@ -198,6 +279,24 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
               )}
             </div>
           ))}
+          
+          {isLoading && (
+            <div className="flex gap-3 justify-start">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Bot className="w-4 h-4 text-blue-600" />
+              </div>
+              <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <div className="animate-pulse flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                  <span className="text-xs text-gray-500">Digitando...</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
 
@@ -207,9 +306,9 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
             placeholder="Digite sua pergunta..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
           />
-          <Button onClick={handleSendMessage} size="sm">
+          <Button onClick={handleSendMessage} size="sm" disabled={isLoading}>
             <Send className="w-4 h-4" />
           </Button>
         </div>

@@ -44,7 +44,7 @@ export function Dashboard({ onPatientSelect }: DashboardProps) {
   return (
     <div className="h-screen overflow-auto p-8">
       <div className="mb-8">
-        <h1 className="text-gray-900 mb-2">Dashboard de Atendimento Clínico</h1>
+        <h1 className="text-gray-900 mb-2">Health Sharp Dashboard</h1>
         <p className="text-gray-600">Visão geral dos atendimentos e métricas</p>
       </div>
 

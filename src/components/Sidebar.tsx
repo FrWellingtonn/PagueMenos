@@ -28,8 +28,8 @@ export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
             <Pill className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-blue-700">Pague Menos</h1>
-            <p className="text-gray-500 text-sm">Atendimento Clínico</p>
+            <h1 className="text-blue-700">Health Sharp</h1>
+            <p className="text-gray-500 text-sm">Sistema Clínico</p>
           </div>
         </div>
       </div>

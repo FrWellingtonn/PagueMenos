@@ -48,7 +48,7 @@ export function DSF() {
         <div class="print-title">LAUDO FARMACÊUTICO</div>
         <div class="print-subtitle">Dispensação Sem Formulação (DSF)</div>
         <div style="font-size: 11px; margin-top: 10px;">
-          Pague Menos - Atendimento Clínico<br>
+          Health Sharp - Sistema Clínico<br>
           Data: ${new Date().toLocaleDateString('pt-BR')}
         </div>
       </div>
@@ -116,7 +116,7 @@ export function DSF() {
       </div>
       
       <div class="print-footer">
-        Este laudo foi gerado pelo Sistema de Atendimento Clínico Pague Menos
+        Este laudo foi gerado pelo Health Sharp
       </div>
     `;
     
