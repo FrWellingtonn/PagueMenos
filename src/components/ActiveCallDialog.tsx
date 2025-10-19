@@ -56,9 +56,8 @@ export function ActiveCallDialog({ consultation, onClose }: ActiveCallDialogProp
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent
-        className="h-[90vh] p-0 overflow-y-auto"
+        className="w-full max-w-6xl h-[90vh] p-0 overflow-y-auto"
         aria-describedby="teleconsultation-description"
-        style={{ width: '90vw', maxWidth: '90vw' }}
       >
         <DialogTitle className="sr-only">
           Teleconsulta em andamento - {patient?.name} com Dr. {consultation.doctorName}
@@ -66,7 +65,7 @@ export function ActiveCallDialog({ consultation, onClose }: ActiveCallDialogProp
         <DialogDescription id="teleconsultation-description" className="sr-only">
           Interface de videochamada para teleconsulta médica com controles de áudio e vídeo, e painel para anotações clínicas e prescrições
         </DialogDescription>
-        <div className="flex h-full">
+        <div className="flex h-full flex-col md:flex-row">
           {/* Video Area */}
           <div className="flex-1 bg-gray-900 relative">
             {/* Header */}
@@ -157,7 +156,7 @@ export function ActiveCallDialog({ consultation, onClose }: ActiveCallDialogProp
           </div>
 
           {/* Side Panel - Clinical Notes and Prescription */}
-          <div className="w-64 bg-white border-l border-gray-200 flex flex-col">
+          <div className="w-full md:w-80 lg:w-96 bg-white md:border-l border-t md:border-t-0 border-gray-200 flex flex-col">
             <div className="p-4 border-b border-gray-200">
               <h3 className="text-gray-900">Anotações e Prescrição</h3>
               <p className="text-sm text-gray-600">Registros da consulta</p>

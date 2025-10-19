@@ -35,11 +35,12 @@ export function PatientManagement({ onPatientSelect }: PatientManagementProps) {
               Novo Paciente
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl" style={{ height: '85vh', maxHeight: '85vh', overflowY: 'auto' }}>
+          <DialogContent className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
             <DialogHeader>
               <DialogTitle>Cadastrar Novo Paciente</DialogTitle>
             </DialogHeader>
-            <div className="grid grid-cols-2 gap-4 py-4">
+            <div className="w-full max-w-2xl mx-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Nome Completo</Label>
                 <Input id="name" placeholder="Digite o nome completo" />
@@ -72,14 +73,15 @@ export function PatientManagement({ onPatientSelect }: PatientManagementProps) {
                 <Label htmlFor="observations">Observações</Label>
                 <Input id="observations" placeholder="Informações adicionais" />
               </div>
-            </div>
-            <div className="flex justify-end gap-3">
+              </div>
+              <div className="flex justify-end gap-3">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancelar
               </Button>
               <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsDialogOpen(false)}>
                 Cadastrar Paciente
               </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

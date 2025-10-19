@@ -19,13 +19,14 @@ interface NewAppointmentDialogProps {
 export function NewAppointmentDialog({ isOpen, onClose, patient }: NewAppointmentDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl" style={{ height: '85vh', maxHeight: '85vh', overflowY: 'auto' }}>
+      <DialogContent className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Novo Atendimento - {patient.name}</DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-2 gap-4 py-4">
-          <div className="col-span-2 space-y-2">
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="type">Tipo de Atendimento</Label>
             <Select>
               <SelectTrigger>
@@ -52,7 +53,7 @@ export function NewAppointmentDialog({ isOpen, onClose, patient }: NewAppointmen
             <Input id="time" type="time" />
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="complaint">Queixa Principal</Label>
             <Textarea id="complaint" placeholder="Descreva a queixa ou motivo do atendimento" />
           </div>
@@ -77,7 +78,7 @@ export function NewAppointmentDialog({ isOpen, onClose, patient }: NewAppointmen
             <Input id="weight" placeholder="Ex: 75 kg" />
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="assessment">Avaliação Farmacêutica</Label>
             <Textarea 
               id="assessment" 
@@ -86,7 +87,7 @@ export function NewAppointmentDialog({ isOpen, onClose, patient }: NewAppointmen
             />
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="plan">Plano de Cuidado</Label>
             <Textarea 
               id="plan" 
@@ -94,7 +95,7 @@ export function NewAppointmentDialog({ isOpen, onClose, patient }: NewAppointmen
             />
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="priority">Prioridade</Label>
             <Select>
               <SelectTrigger>
@@ -116,6 +117,7 @@ export function NewAppointmentDialog({ isOpen, onClose, patient }: NewAppointmen
           <Button className="bg-blue-600 hover:bg-blue-700" onClick={onClose}>
             Salvar Atendimento
           </Button>
+        </div>
         </div>
       </DialogContent>
     </Dialog>

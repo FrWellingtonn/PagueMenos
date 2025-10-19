@@ -7,7 +7,6 @@ import { Alert, AlertDescription } from './ui/alert';
 import { Input } from './ui/input';
 import { 
   User, 
-  FileText, 
   Pill, 
   Activity, 
   AlertTriangle, 
@@ -15,7 +14,6 @@ import {
   Plus,
   Thermometer,
   Heart,
-  Weight,
   Edit2,
   Check,
   X as XIcon,
@@ -132,7 +130,7 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
 
       {/* Tabs */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
+        <TabsList className="self-center mx-auto">
           <TabsTrigger value="overview">
             <Activity className="w-4 h-4 mr-2" />
             Visão Geral

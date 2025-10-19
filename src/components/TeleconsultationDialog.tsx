@@ -14,13 +14,14 @@ interface TeleconsultationDialogProps {
 export function TeleconsultationDialog({ isOpen, onClose }: TeleconsultationDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl" style={{ height: '85vh', maxHeight: '85vh', overflowY: 'auto' }}>
+      <DialogContent className="w-full max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Agendar Nova Teleconsulta</DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-2 gap-4 py-4">
-          <div className="col-span-2 space-y-2">
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="patient">Paciente</Label>
             <Select>
               <SelectTrigger>
@@ -46,7 +47,7 @@ export function TeleconsultationDialog({ isOpen, onClose }: TeleconsultationDial
             <Input id="time" type="time" />
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="doctor">Médico</Label>
             <Select>
               <SelectTrigger>
@@ -61,7 +62,7 @@ export function TeleconsultationDialog({ isOpen, onClose }: TeleconsultationDial
             </Select>
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="reason">Motivo da Consulta</Label>
             <Textarea 
               id="reason" 
@@ -70,7 +71,7 @@ export function TeleconsultationDialog({ isOpen, onClose }: TeleconsultationDial
             />
           </div>
 
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-1 sm:col-span-2 space-y-2">
             <Label htmlFor="observations">Observações Prévias</Label>
             <Textarea 
               id="observations" 
@@ -78,21 +79,22 @@ export function TeleconsultationDialog({ isOpen, onClose }: TeleconsultationDial
             />
           </div>
 
-          <div className="col-span-2 p-4 bg-blue-50 rounded-lg">
+          <div className="col-span-1 sm:col-span-2 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-900">
               <span className="font-medium">Atenção:</span> Apenas o médico pode prescrever medicamentos durante a teleconsulta. 
               As prescrições serão automaticamente integradas ao prontuário do paciente.
             </p>
           </div>
-        </div>
+          </div>
 
-        <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
           <Button className="bg-blue-600 hover:bg-blue-700" onClick={onClose}>
             Agendar Teleconsulta
           </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

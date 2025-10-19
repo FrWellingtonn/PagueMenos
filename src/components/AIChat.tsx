@@ -74,15 +74,17 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: userMessage,
-          patientContext: patientContext,
-          systemContext: 'Health Sharp - Sistema Clínico Farmacêutico'
+          message: `Sistema: Health Sharp - Sistema Clínico Farmacêutico
+
+Contexto do Paciente: ${patientContext ? JSON.stringify(patientContext, null, 2) : 'Nenhum paciente selecionado'}
+
+Pergunta: ${userMessage}`
         })
       });
       
       if (response.ok) {
         const data = await response.json();
-        return data.response || data.perguntas?.join('\n\n') || 'Desculpe, não consegui processar sua solicitação.';
+        return data.response || data.message || 'Desculpe, não consegui processar sua solicitação.';
       } else {
         console.error('Erro HTTP:', response.status, response.statusText);
       }
