@@ -62,6 +62,18 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
 
   const patientAppointments = mockAppointments.filter(apt => apt.patientId === patient.id);
   const patientMedications = mockMedications.filter(med => med.patientId === patient.id);
+  
+  console.log('=== DEBUG INFO ===');
+  console.log('selectedPatientId:', selectedPatientId);
+  console.log('Patient found:', patient);
+  console.log('Patient ID:', patient.id);
+  console.log('All appointments:', mockAppointments);
+  console.log('All medications:', mockMedications);
+  console.log('Filtered appointments:', patientAppointments);
+  console.log('Filtered medications:', patientMedications);
+  console.log('Medical medications:', patientMedications.filter(m => m.prescriptionType === 'medical'));
+  console.log('Pharmacy medications:', patientMedications.filter(m => m.prescriptionType === 'pharmacy'));
+  console.log('==================');
 
   return (
     <div className={`h-screen overflow-auto p-8 ${showAIChat ? 'pr-4' : ''}`}>
@@ -312,12 +324,16 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
                 Medicamentos Atuais
               </h3>
               <div className="space-y-3">
-                {patientMedications.filter(med => med.status === 'active').slice(0, 4).map((medication) => (
-                  <div key={medication.id} className="text-sm p-2 bg-gray-50 rounded">
-                    <p className="text-gray-900">{medication.name}</p>
-                    <p className="text-gray-500 text-xs">{medication.dosage}</p>
-                  </div>
-                ))}
+                {patientMedications.filter(med => med.status === 'active').length > 0 ? (
+                  patientMedications.filter(med => med.status === 'active').slice(0, 4).map((medication) => (
+                    <div key={medication.id} className="text-sm p-2 bg-gray-50 rounded">
+                      <p className="text-gray-900">{medication.name}</p>
+                      <p className="text-gray-500 text-xs">{medication.dosage}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">Nenhum medicamento ativo</p>
+                )}
               </div>
               <p className="text-xs text-gray-500 mt-3">
                 Para editar medicamentos, acesse a aba "Medicamentos"
@@ -329,20 +345,24 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
           <Card className="p-6">
             <h3 className="text-gray-900 mb-4">Últimos Atendimentos</h3>
             <div className="space-y-4">
-              {patientAppointments.slice(0, 3).map((appointment) => (
-                <div key={appointment.id} className="p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-gray-900">{appointment.type}</p>
-                      <p className="text-gray-500 text-sm">{appointment.date} às {appointment.time}</p>
+              {patientAppointments.length > 0 ? (
+                patientAppointments.slice(0, 3).map((appointment) => (
+                  <div key={appointment.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-gray-900">{appointment.type}</p>
+                        <p className="text-gray-500 text-sm">{appointment.date} às {appointment.time}</p>
+                      </div>
+                      <Badge variant={appointment.priority === 'urgent' ? 'destructive' : 'outline'}>
+                        {appointment.priority === 'urgent' ? 'Urgente' : 'Normal'}
+                      </Badge>
                     </div>
-                    <Badge variant={appointment.priority === 'urgent' ? 'destructive' : 'outline'}>
-                      {appointment.priority === 'urgent' ? 'Urgente' : 'Normal'}
-                    </Badge>
+                    <p className="text-gray-600 text-sm">{appointment.notes}</p>
                   </div>
-                  <p className="text-gray-600 text-sm">{appointment.notes}</p>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">Nenhum atendimento registrado</p>
+              )}
             </div>
           </Card>
         </TabsContent>
@@ -362,7 +382,8 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
               </p>
 
               <div className="space-y-4">
-                {patientMedications.filter(m => m.prescriptionType === 'medical').map((medication) => (
+                {patientMedications.filter(m => m.prescriptionType === 'medical').length > 0 ? (
+                  patientMedications.filter(m => m.prescriptionType === 'medical').map((medication) => (
                   <div key={medication.id} className="p-4 border-2 border-blue-200 bg-blue-50/50 rounded-lg">
                     <div className="flex items-start justify-between mb-3">
                       <div>
@@ -413,7 +434,13 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
                       </div>
                     )}
                   </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Pill className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p>Nenhuma prescrição médica registrada</p>
+                  </div>
+                )}
               </div>
             </Card>
 
@@ -475,23 +502,30 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
           <Card className="p-6">
             <h3 className="text-gray-900 mb-6">Histórico Completo de Atendimentos</h3>
             <div className="space-y-4">
-              {patientAppointments.map((appointment) => (
-                <div key={appointment.id} className="p-5 border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h4 className="text-gray-900">{appointment.type}</h4>
-                      <p className="text-gray-500 text-sm">{appointment.date} às {appointment.time}</p>
+              {patientAppointments.length > 0 ? (
+                patientAppointments.map((appointment) => (
+                  <div key={appointment.id} className="p-5 border border-gray-200 rounded-lg hover:border-blue-200 transition-colors">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="text-gray-900">{appointment.type}</h4>
+                        <p className="text-gray-500 text-sm">{appointment.date} às {appointment.time}</p>
+                      </div>
+                      <Badge variant={appointment.priority === 'urgent' ? 'destructive' : 'outline'}>
+                        {appointment.priority === 'urgent' ? 'Urgente' : 'Normal'}
+                      </Badge>
                     </div>
-                    <Badge variant={appointment.priority === 'urgent' ? 'destructive' : 'outline'}>
-                      {appointment.priority === 'urgent' ? 'Urgente' : 'Normal'}
-                    </Badge>
+                    <p className="text-gray-700 mb-3">{appointment.notes}</p>
+                    <div className="text-sm text-gray-500">
+                      Farmacêutico: {appointment.pharmacist}
+                    </div>
                   </div>
-                  <p className="text-gray-700 mb-3">{appointment.notes}</p>
-                  <div className="text-sm text-gray-500">
-                    Farmacêutico: {appointment.pharmacist}
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                  <p>Nenhum atendimento registrado</p>
                 </div>
-              ))}
+              )}
             </div>
           </Card>
         </TabsContent>

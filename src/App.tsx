@@ -39,6 +39,7 @@ export default function App() {
   const navigate = useNavigate();
 
   const handlePatientSelect = (patientId: string) => {
+    console.log('Selecting patient with ID:', patientId);
     setSelectedPatientId(patientId);
     navigate('/record');
     setActiveMenu('record');

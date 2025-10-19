@@ -343,6 +343,30 @@ export const mockMedications: Medication[] = [
     status: 'active',
     notes: 'Técnica inalatória corrigida em 18/10/2025.',
   },
+  {
+    id: '12',
+    patientId: '1',
+    name: 'Vitamina D3',
+    dosage: '2000UI',
+    frequency: '1x ao dia',
+    startDate: '2024-10-01',
+    duration: '3 meses',
+    prescribedBy: 'Dr. Fernando Martins - CRF 12345/CE',
+    prescriptionType: 'pharmacy',
+    status: 'active',
+  },
+  {
+    id: '13',
+    patientId: '2',
+    name: 'Omega 3',
+    dosage: '1000mg',
+    frequency: '1x ao dia',
+    startDate: '2024-09-15',
+    duration: '6 meses',
+    prescribedBy: 'Dra. Paula Oliveira - CRF 23456/CE',
+    prescriptionType: 'pharmacy',
+    status: 'active',
+  },
 ];
 
 export const mockTeleconsultations: Teleconsultation[] = [
