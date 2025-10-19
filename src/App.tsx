@@ -25,7 +25,7 @@ export default function App() {
     <div className="flex h-screen bg-gray-50">
       <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
       
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-hidden">
         {activeMenu === 'dashboard' && <Dashboard onPatientSelect={handlePatientSelect} />}
         {activeMenu === 'patients' && <PatientManagement onPatientSelect={handlePatientSelect} />}
         {activeMenu === 'record' && <ClinicalRecord selectedPatientId={selectedPatientId} />}

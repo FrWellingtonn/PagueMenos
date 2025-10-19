@@ -64,7 +64,7 @@ export function SalesHistory() {
   const totalSpent = customerSales.reduce((sum, sale) => sum + sale.totalAmount, 0);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="h-screen overflow-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Histórico de Vendas</h1>

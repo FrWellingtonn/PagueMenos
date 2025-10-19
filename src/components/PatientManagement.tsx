@@ -21,7 +21,7 @@ export function PatientManagement({ onPatientSelect }: PatientManagementProps) {
   );
 
   return (
-    <div className="p-8">
+    <div className="h-screen overflow-auto p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-gray-900 mb-2">Gestão de Pacientes</h1>

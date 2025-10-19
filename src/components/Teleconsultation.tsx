@@ -43,7 +43,7 @@ export function Teleconsultation({ onPatientSelect }: TeleconsultationProps) {
   const currentConsultation = mockTeleconsultations.find(c => c.id === activeCall);
 
   return (
-    <div className="p-8">
+    <div className="h-screen overflow-auto p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-gray-900 mb-2">Teleconsulta Médica</h1>

@@ -2,11 +2,14 @@ import { useState } from 'react';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
-import { Calendar, Search, Filter } from 'lucide-react';
+import { Button } from './ui/button';
+import { Calendar, Search, Filter, Bot } from 'lucide-react';
 import { mockAppointments, mockPatients } from '../data/mockData';
+import { AIChat } from './AIChat';
 
 export function AppointmentHistory() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAIChat, setShowAIChat] = useState(false);
 
   const filteredAppointments = mockAppointments.filter(appointment => {
     const patient = mockPatients.find(p => p.id === appointment.patientId);
@@ -15,11 +18,22 @@ export function AppointmentHistory() {
   });
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-gray-900 mb-2">Histórico de Atendimentos</h1>
-        <p className="text-gray-600">Visualize todos os atendimentos realizados</p>
-      </div>
+    <div className={`h-screen overflow-auto p-8 ${showAIChat ? 'pr-4' : ''}`}>
+      <div className="flex gap-6">
+        <div className={showAIChat ? 'flex-1' : 'w-full'}>
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-gray-900 mb-2">Histórico de Atendimentos</h1>
+              <p className="text-gray-600">Visualize todos os atendimentos realizados</p>
+            </div>
+            <Button 
+              variant="outline"
+              onClick={() => setShowAIChat(!showAIChat)}
+            >
+              <Bot className="w-4 h-4 mr-2" />
+              Modo IA
+            </Button>
+          </div>
 
       {/* Search and Filters */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -80,6 +94,14 @@ export function AppointmentHistory() {
             </Card>
           );
         })}
+          </div>
+        </div>
+        
+        {showAIChat && (
+          <div className="w-96 h-[calc(100vh-8rem)]">
+            <AIChat onClose={() => setShowAIChat(false)} />
+          </div>
+        )}
       </div>
     </div>
   );

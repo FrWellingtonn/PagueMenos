@@ -18,10 +18,12 @@ import {
   Weight,
   Edit2,
   Check,
-  X as XIcon
+  X as XIcon,
+  Bot
 } from 'lucide-react';
 import { mockPatients, mockAppointments, mockMedications } from '../data/mockData';
 import { NewAppointmentDialog } from './NewAppointmentDialog';
+import { AIChat } from './AIChat';
 
 interface ClinicalRecordProps {
   selectedPatientId: string | null;
@@ -32,6 +34,7 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
   const [isEditingVitals, setIsEditingVitals] = useState(false);
   const [isEditingConditions, setIsEditingConditions] = useState(false);
   const [newCondition, setNewCondition] = useState('');
+  const [showAIChat, setShowAIChat] = useState(false);
   
   // Vital Signs State
   const [vitalSigns, setVitalSigns] = useState({
@@ -63,7 +66,9 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
   const patientMedications = mockMedications.filter(med => med.patientId === patient.id);
 
   return (
-    <div className="p-8">
+    <div className={`h-screen overflow-auto p-8 ${showAIChat ? 'pr-4' : ''}`}>
+      <div className="flex gap-6">
+        <div className={showAIChat ? 'flex-1' : 'w-full'}>
       {/* Patient Header */}
       <Card className="p-6 mb-6">
         <div className="flex items-start justify-between">
@@ -95,13 +100,22 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
             </div>
           </div>
 
-          <Button 
-            className="bg-blue-600 hover:bg-blue-700"
-            onClick={() => setIsNewAppointmentOpen(true)}
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Novo Atendimento
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline"
+              onClick={() => setShowAIChat(!showAIChat)}
+            >
+              <Bot className="w-4 h-4 mr-2" />
+              Modo IA
+            </Button>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => setIsNewAppointmentOpen(true)}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Novo Atendimento
+            </Button>
+          </div>
         </div>
 
         {/* Alerts */}
@@ -484,6 +498,18 @@ export function ClinicalRecord({ selectedPatientId }: ClinicalRecordProps) {
           </Card>
         </TabsContent>
       </Tabs>
+
+        </div>
+        
+        {showAIChat && (
+          <div className="w-96 h-[calc(100vh-8rem)]">
+            <AIChat 
+              patientCpf={patient.cpf}
+              onClose={() => setShowAIChat(false)}
+            />
+          </div>
+        )}
+      </div>
 
       <NewAppointmentDialog 
         isOpen={isNewAppointmentOpen}

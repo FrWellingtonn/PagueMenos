@@ -19,7 +19,7 @@ export function MedicationControl() {
   const withInteractions = filteredMedications.filter(med => med.interactions);
 
   return (
-    <div className="p-8">
+    <div className="h-screen overflow-auto p-8">
       <div className="mb-8">
         <h1 className="text-gray-900 mb-2">Controle de Medicamentos</h1>
         <p className="text-gray-600">Gestão de prescrições e alertas de interações</p>

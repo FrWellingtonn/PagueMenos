@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
@@ -6,6 +6,7 @@ import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { mockPatients } from '../data/mockData';
+import '../styles/print.css';
 
 export function DSF() {
   const [patientId, setPatientId] = useState<string>('');
@@ -39,6 +40,91 @@ export function DSF() {
     setShowPreview(true);
   };
 
+  const handlePrint = () => {
+    const printContent = document.createElement('div');
+    printContent.className = 'print-content';
+    printContent.innerHTML = `
+      <div class="print-header">
+        <div class="print-title">LAUDO FARMACÊUTICO</div>
+        <div class="print-subtitle">Dispensação Sem Formulação (DSF)</div>
+        <div style="font-size: 11px; margin-top: 10px;">
+          Pague Menos - Atendimento Clínico<br>
+          Data: ${new Date().toLocaleDateString('pt-BR')}
+        </div>
+      </div>
+      
+      <div class="print-section">
+        <div class="print-section-title">Identificação do Paciente</div>
+        <div class="print-field">
+          <span class="print-field-label">Nome:</span> ${selectedPatient?.name || '—'}
+        </div>
+        <div class="print-field">
+          <span class="print-field-label">CPF:</span> ${selectedPatient?.cpf || '—'}
+        </div>
+        <div class="print-field">
+          <span class="print-field-label">Idade:</span> ${selectedPatient?.age || '—'} anos
+        </div>
+        <div class="print-field">
+          <span class="print-field-label">Sexo:</span> ${selectedPatient?.gender || '—'}
+        </div>
+        <div class="print-field">
+          <span class="print-field-label">Telefone:</span> ${selectedPatient?.phone || '—'}
+        </div>
+      </div>
+      
+      <div class="print-section">
+        <div class="print-section-title">Medicamento Dispensado</div>
+        <div class="print-field">
+          <span class="print-field-label">Produto:</span> ${product || '—'}
+        </div>
+        <div class="print-field">
+          <span class="print-field-label">Quantidade:</span> ${quantity || '—'}
+        </div>
+        <div class="print-field">
+          <span class="print-field-label">Posologia:</span> ${posology || '—'}
+        </div>
+      </div>
+      
+      <div class="print-section">
+        <div class="print-section-title">Justificativa Técnica</div>
+        <div style="text-align: justify; line-height: 1.5;">
+          ${justification || 'Não informado'}
+        </div>
+      </div>
+      
+      <div class="print-section">
+        <div class="print-section-title">Orientações ao Paciente</div>
+        <div style="text-align: justify; line-height: 1.5;">
+          ${orientation || 'Não informado'}
+        </div>
+      </div>
+      
+      <div class="print-section">
+        <div class="print-section-title">Contraindicações e Precauções</div>
+        <div style="text-align: justify; line-height: 1.5;">
+          ${contraindications || 'Não informado'}
+        </div>
+      </div>
+      
+      <div class="print-signature">
+        <div class="print-signature-line"></div>
+        <div style="margin-top: 10px; font-weight: bold;">
+          Dr. Fernando Martins<br>
+          Farmacêutico Responsável<br>
+          CRF/CE 12345
+        </div>
+      </div>
+      
+      <div class="print-footer">
+        Este laudo foi gerado pelo Sistema de Atendimento Clínico Pague Menos
+      </div>
+    `;
+    
+    document.body.appendChild(printContent);
+    window.print();
+    document.body.removeChild(printContent);
+  };
+
   const handleClear = () => {
     setProduct('');
     setQuantity('');
@@ -53,7 +139,7 @@ export function DSF() {
   };
 
   return (
-    <div className="p-8">
+    <div className="h-screen overflow-auto p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-gray-900 mb-2">Dispensação Sem Formulação (DSF)</h1>
@@ -160,7 +246,7 @@ export function DSF() {
 
               <div className="pt-2 flex justify-end gap-3">
                 <Button variant="outline" onClick={() => setShowPreview(false)}>Editar</Button>
-                <Button onClick={() => window.print()}>Imprimir</Button>
+                <Button onClick={handlePrint}>Imprimir Laudo</Button>
               </div>
             </div>
           ) : (
