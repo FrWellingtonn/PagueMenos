@@ -8,8 +8,9 @@ import { MedicationControl } from './components/MedicationControl';
 import { Reports } from './components/Reports';
 import { Teleconsultation } from './components/Teleconsultation';
 import { DSF } from './components/DSF';
+import { SalesHistory } from './components/SalesHistory';
 
-export type MenuItem = 'dashboard' | 'patients' | 'record' | 'history' | 'medications' | 'teleconsultation' | 'reports' | 'dsf';
+export type MenuItem = 'dashboard' | 'patients' | 'record' | 'history' | 'medications' | 'teleconsultation' | 'reports' | 'dsf' | 'sales-history';
 
 export default function App() {
   const [activeMenu, setActiveMenu] = useState<MenuItem>('dashboard');
@@ -33,6 +34,7 @@ export default function App() {
         {activeMenu === 'teleconsultation' && <Teleconsultation onPatientSelect={handlePatientSelect} />}
         {activeMenu === 'dsf' && <DSF />}
         {activeMenu === 'reports' && <Reports />}
+        {activeMenu === 'sales-history' && <SalesHistory />}
       </main>
     </div>
   );

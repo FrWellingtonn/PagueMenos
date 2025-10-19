@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, FileText, History, Pill, BarChart3, Video, FileCheck } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, History, Pill, BarChart3, Video, FileCheck, ShoppingCart } from 'lucide-react';
 import type { MenuItem } from '../App';
 
 interface SidebarProps {
@@ -15,6 +15,7 @@ export function Sidebar({ activeMenu, setActiveMenu }: SidebarProps) {
     { id: 'medications' as MenuItem, label: 'Medicamentos', icon: Pill },
     { id: 'teleconsultation' as MenuItem, label: 'Teleconsulta', icon: Video },
     { id: 'dsf' as MenuItem, label: 'Laudo DSF', icon: FileCheck },
+    { id: 'sales-history' as MenuItem, label: 'Histórico de Vendas', icon: ShoppingCart },
     { id: 'reports' as MenuItem, label: 'Relatórios', icon: BarChart3 },
   ];
 

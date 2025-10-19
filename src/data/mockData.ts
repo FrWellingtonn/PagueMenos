@@ -51,6 +51,36 @@ export interface Teleconsultation {
   notes?: string;
 }
 
+export interface Sale {
+  id: string;
+  patientCpf: string;
+  patientName: string;
+  date: string;
+  time: string;
+  products: {
+    id: string;
+    name: string;
+    category: string;
+    quantity: number;
+    unitPrice: number;
+    total: number;
+  }[];
+  totalAmount: number;
+  paymentMethod: string;
+  pharmacist: string;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  description: string;
+  activeIngredient: string;
+  manufacturer: string;
+  inStock: boolean;
+}
+
 export const mockPatients: Patient[] = [
   {
     id: '1',
@@ -412,4 +442,163 @@ export const mockTeleconsultations: Teleconsultation[] = [
     ],
     notes: 'Demonstrada técnica inalatória correta. Orientações sobre gatilhos e prevenção de crises. Retorno em 15 dias.',
   },
+];
+export const mockSales: Sale[] = [
+  {
+    id: '1',
+    patientCpf: '123.456.789-00',
+    patientName: 'Maria Santos Silva',
+    date: '2025-10-18',
+    time: '09:30',
+    products: [
+      {
+        id: '1',
+        name: 'Losartana Potássica 50mg',
+        category: 'Anti-hipertensivo',
+        quantity: 1,
+        unitPrice: 15.90,
+        total: 15.90
+      },
+      {
+        id: '2',
+        name: 'Metformina 850mg',
+        category: 'Antidiabético',
+        quantity: 2,
+        unitPrice: 8.50,
+        total: 17.00
+      }
+    ],
+    totalAmount: 32.90,
+    paymentMethod: 'Cartão de Débito',
+    pharmacist: 'Dr. Fernando Martins'
+  },
+  {
+    id: '2',
+    patientCpf: '234.567.890-11',
+    patientName: 'João Silva Oliveira',
+    date: '2025-10-17',
+    time: '14:15',
+    products: [
+      {
+        id: '3',
+        name: 'Carvedilol 25mg',
+        category: 'Beta-bloqueador',
+        quantity: 1,
+        unitPrice: 22.30,
+        total: 22.30
+      },
+      {
+        id: '4',
+        name: 'Furosemida 40mg',
+        category: 'Diurético',
+        quantity: 1,
+        unitPrice: 12.80,
+        total: 12.80
+      }
+    ],
+    totalAmount: 35.10,
+    paymentMethod: 'Dinheiro',
+    pharmacist: 'Dra. Paula Oliveira'
+  },
+  {
+    id: '3',
+    patientCpf: '123.456.789-00',
+    patientName: 'Maria Santos Silva',
+    date: '2025-10-15',
+    time: '16:45',
+    products: [
+      {
+        id: '5',
+        name: 'Sinvastatina 20mg',
+        category: 'Hipolipemiante',
+        quantity: 1,
+        unitPrice: 18.70,
+        total: 18.70
+      },
+      {
+        id: '6',
+        name: 'Vitamina D3 2000UI',
+        category: 'Vitamina',
+        quantity: 1,
+        unitPrice: 25.90,
+        total: 25.90
+      }
+    ],
+    totalAmount: 44.60,
+    paymentMethod: 'PIX',
+    pharmacist: 'Dr. Fernando Martins'
+  },
+  {
+    id: '4',
+    patientCpf: '345.678.901-22',
+    patientName: 'Ana Costa Ferreira',
+    date: '2025-10-14',
+    time: '11:20',
+    products: [
+      {
+        id: '7',
+        name: 'Metformina 1000mg',
+        category: 'Antidiabético',
+        quantity: 2,
+        unitPrice: 12.40,
+        total: 24.80
+      }
+    ],
+    totalAmount: 24.80,
+    paymentMethod: 'Cartão de Crédito',
+    pharmacist: 'Dra. Paula Oliveira'
+  }
+];
+
+export const mockProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Losartana Potássica 50mg',
+    category: 'Anti-hipertensivo',
+    price: 15.90,
+    description: 'Medicamento para tratamento da hipertensão arterial',
+    activeIngredient: 'Losartana Potássica',
+    manufacturer: 'EMS',
+    inStock: true
+  },
+  {
+    id: '2',
+    name: 'Metformina 850mg',
+    category: 'Antidiabético',
+    price: 8.50,
+    description: 'Medicamento para controle da diabetes tipo 2',
+    activeIngredient: 'Cloridrato de Metformina',
+    manufacturer: 'Medley',
+    inStock: true
+  },
+  {
+    id: '8',
+    name: 'Enalapril 20mg',
+    category: 'Anti-hipertensivo',
+    price: 14.20,
+    description: 'Medicamento similar para hipertensão',
+    activeIngredient: 'Maleato de Enalapril',
+    manufacturer: 'Eurofarma',
+    inStock: true
+  },
+  {
+    id: '9',
+    name: 'Gliclazida 30mg',
+    category: 'Antidiabético',
+    price: 16.80,
+    description: 'Alternativa para controle glicêmico',
+    activeIngredient: 'Gliclazida',
+    manufacturer: 'Sandoz',
+    inStock: true
+  },
+  {
+    id: '10',
+    name: 'Omega 3 1000mg',
+    category: 'Suplemento',
+    price: 32.90,
+    description: 'Suplemento para saúde cardiovascular',
+    activeIngredient: 'Ácidos graxos ômega-3',
+    manufacturer: 'Vitafor',
+    inStock: true
+  }
 ];
