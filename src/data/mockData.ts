@@ -22,6 +22,28 @@ export interface Appointment {
   notes: string;
 }
 
+export interface Exam {
+  id: string;
+  patientId: string;
+  type: string;
+  date: string;
+  result: string;
+  reference: string;
+  status: 'pending' | 'completed' | 'abnormal';
+  notes?: string;
+}
+
+export interface MedicationDose {
+  id: string;
+  medicationId: string;
+  patientId: string;
+  date: string;
+  time: string;
+  status: 'scheduled' | 'taken' | 'missed' | 'delayed';
+  administeredBy?: string;
+  notes?: string;
+}
+
 export interface Medication {
   id: string;
   patientId: string;
@@ -29,12 +51,17 @@ export interface Medication {
   dosage: string;
   frequency: string;
   startDate: string;
+  endDate?: string;
   duration: string;
   prescribedBy: string;
-  prescriptionType: 'medical' | 'pharmacy'; // medical = prescrito por médico, pharmacy = orientação farmacêutica
-  status: 'active' | 'inactive';
+  prescriptionType: 'medical' | 'pharmacy';
+  status: 'active' | 'completed' | 'paused' | 'cancelled';
   interactions?: string;
   notes?: string;
+  nextDose?: string;
+  lastDose?: string;
+  totalDoses?: number;
+  dosesTaken?: number;
 }
 
 export interface Teleconsultation {
@@ -80,6 +107,69 @@ export interface Product {
   manufacturer: string;
   inStock: boolean;
 }
+
+export const mockExams: Exam[] = [
+  {
+    id: '1',
+    patientId: '1',
+    type: 'Hemograma Completo',
+    date: '2025-10-10',
+    result: 'Dentro dos parâmetros normais',
+    reference: 'Ver relatório completo',
+    status: 'completed',
+    notes: 'Próximo exame em 6 meses'
+  },
+  {
+    id: '2',
+    patientId: '1',
+    type: 'Glicemia em Jejum',
+    date: '2025-10-10',
+    result: '126 mg/dL',
+    reference: '70-99 mg/dL',
+    status: 'abnormal',
+    notes: 'Monitorar glicemia capilar'
+  },
+  {
+    id: '3',
+    patientId: '2',
+    type: 'Perfil Lipídico',
+    date: '2025-09-20',
+    result: 'Colesterol Total: 210 mg/dL',
+    reference: '< 200 mg/dL',
+    status: 'abnormal',
+    notes: 'Iniciar acompanhamento nutricional'
+  }
+];
+
+export const mockMedicationDoses: MedicationDose[] = [
+  {
+    id: '1',
+    medicationId: '1',
+    patientId: '1',
+    date: '2025-10-18',
+    time: '08:00',
+    status: 'taken',
+    administeredBy: 'Dr. Silva'
+  },
+  {
+    id: '2',
+    medicationId: '1',
+    patientId: '1',
+    date: '2025-10-19',
+    time: '08:00',
+    status: 'scheduled',
+    notes: 'Próxima dose'
+  },
+  {
+    id: '3',
+    medicationId: '2',
+    patientId: '2',
+    date: '2025-10-17',
+    time: '20:00',
+    status: 'missed',
+    notes: 'Paciente não compareceu'
+  }
+];
 
 export const mockPatients: Patient[] = [
   {

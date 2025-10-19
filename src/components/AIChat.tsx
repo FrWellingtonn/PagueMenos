@@ -4,7 +4,34 @@ import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { ScrollArea } from './ui/scroll-area';
 import { Send, Bot, User, X } from 'lucide-react';
-import { mockPatients, mockAppointments, mockMedications, mockSales } from '../data/mockData';
+import { mockPatients, mockAppointments, mockMedications, mockSales, mockTeleconsultations, mockExams, mockMedicationDoses } from '../data/mockData';
+
+// Simulação da API Gemini (substitua pela real quando instalar @google/genai)
+const callGeminiAPI = async (prompt: string): Promise<string> => {
+  try {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyCKbOq-ySqQoz4XCE-HU7NyL3hI6MmHR0M', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }]
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data.candidates[0].content.parts[0].text;
+    }
+  } catch (error) {
+    console.error('Erro na API Gemini:', error);
+  }
+  return '';
+};
 
 interface Message {
   id: string;
@@ -23,7 +50,7 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
     {
       id: '1',
       type: 'ai',
-      content: 'Olá! Sou seu assistente de IA powered by Amazon Nova Premier v1:0. Posso ajudar com informações sobre pacientes, histórico médico, medicamentos e vendas. Como posso ajudar?',
+      content: patientCpf ? `Olá! 😊 Estou aqui para ajudar com informações do paciente selecionado. Pergunte sobre dados, medicamentos, histórico ou alergias.` : 'Olá! 😊 Sou seu assistente de IA farmacêutico powered by Gemini. Selecione um paciente no prontuário para começar.',
       timestamp: new Date()
     }
   ]);
@@ -31,169 +58,116 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
   const [inputValue, setInputValue] = useState('');
 
   const generateAIResponse = async (userMessage: string): Promise<string> => {
-    try {
-      // Preparar contexto do paciente se disponível
-      let patientContext = null;
-      if (patientCpf) {
-        const patient = mockPatients.find(p => p.cpf === patientCpf);
-        if (patient) {
-          const appointments = mockAppointments.filter(a => a.patientId === patient.id);
-          const medications = mockMedications.filter(m => m.patientId === patient.id);
-          const sales = mockSales.filter(s => s.patientCpf === patient.cpf);
-          
-          patientContext = {
-            patient: {
-              name: patient.name,
-              age: patient.age,
-              cpf: patient.cpf,
-              allergies: patient.allergies,
-              conditions: patient.conditions
-            },
-            appointments: appointments.map(a => ({
-              date: a.date,
-              type: a.type,
-              notes: a.notes
-            })),
-            medications: medications.map(m => ({
-              name: m.name,
-              dosage: m.dosage,
-              status: m.status
-            })),
-            sales: sales.map(s => ({
-              date: s.date,
-              products: s.products.map(p => p.name),
-              total: s.totalAmount
-            }))
-          };
-        }
-      }
-      
-      const response = await fetch('https://xzyrgf6hy7oxnukqbedda5xblq0omzrx.lambda-url.us-east-2.on.aws/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: `Sistema: Health Sharp - Sistema Clínico Farmacêutico
-
-Contexto do Paciente: ${patientContext ? JSON.stringify(patientContext, null, 2) : 'Nenhum paciente selecionado'}
-
-Pergunta: ${userMessage}`
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        return data.response || data.message || 'Desculpe, não consegui processar sua solicitação.';
-      } else {
-        console.error('Erro HTTP:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Erro na API:', error);
-    }
-    
-    // Fallback para resposta local se API falhar
-    return generateLocalResponse(userMessage);
-  };
-
-  const generateLocalResponse = (userMessage: string): string => {
-    const message = userMessage.toLowerCase();
-    
-    // Buscar paciente por CPF se fornecido
+    // Buscar paciente
     let patient = null;
     if (patientCpf) {
       patient = mockPatients.find(p => p.cpf === patientCpf);
     }
-    
-    // Extrair CPF da mensagem se mencionado
-    const cpfMatch = userMessage.match(/\d{3}\.?\d{3}\.?\d{3}-?\d{2}/);
-    if (cpfMatch && !patient) {
-      const extractedCpf = cpfMatch[0];
-      patient = mockPatients.find(p => p.cpf.replace(/\D/g, '') === extractedCpf.replace(/\D/g, ''));
+
+    // Preparar contexto completo do paciente para a IA
+    let patientContext = '';
+    if (patient) {
+      const medications = mockMedications.filter(m => m.patientId === patient.id);
+      const appointments = mockAppointments.filter(a => a.patientId === patient.id);
+      const sales = mockSales.filter(s => s.patientCpf === patient.cpf);
+      const teleconsultations = mockTeleconsultations.filter(t => t.patientId === patient.id);
+      const exams = mockExams.filter(e => e.patientId === patient.id);
+      const doses = mockMedicationDoses.filter(d => d.patientId === patient.id);
+      
+      patientContext = `
+CONTEXTO COMPLETO DO PACIENTE:
+
+=== DADOS PESSOAIS ===
+Nome: ${patient.name}
+Idade: ${patient.age} anos
+Sexo: ${patient.gender}
+CPF: ${patient.cpf}
+Telefone: ${patient.phone}
+Email: ${patient.email}
+Endereço: ${patient.address}
+
+=== CONDIÇÕES DE SAÚDE ===
+Condições: ${patient.conditions.join(', ')}
+Alergias: ${patient.allergies.join(', ') || 'Nenhuma'}
+
+=== MEDICAMENTOS ===
+Medicamentos ativos: ${medications.filter(m => m.status === 'active').map(m => `${m.name} ${m.dosage} - ${m.frequency} (${m.prescribedBy})`).join('; ')}
+Medicamentos inativos: ${medications.filter(m => m.status !== 'active').map(m => `${m.name} - Status: ${m.status}`).join('; ')}
+Interações: ${medications.filter(m => m.interactions).map(m => `${m.name}: ${m.interactions}`).join('; ')}
+
+=== HISTÓRICO DE ATENDIMENTOS ===
+${appointments.map(a => `${a.date} - ${a.type} (${a.pharmacist}): ${a.notes}`).join('\n')}
+
+=== TELECONSULTAS ===
+${teleconsultations.map(t => `${t.date} - Dr. ${t.doctorName} (${t.doctorCRM}): ${t.reason} - Status: ${t.status}${t.diagnosis ? ' - Diagnóstico: ' + t.diagnosis : ''}`).join('\n')}
+
+=== EXAMES ===
+${exams.map(e => `${e.date} - ${e.type}: ${e.result} (Referência: ${e.reference}) - Status: ${e.status}`).join('\n')}
+
+=== HISTÓRICO DE VENDAS ===
+${sales.map(s => `${s.date} - R$ ${s.totalAmount.toFixed(2)} - Produtos: ${s.products.map(p => p.name).join(', ')} - Pagamento: ${s.paymentMethod}`).join('\n')}
+
+=== CONTROLE DE DOSES ===
+${doses.map(d => `Medicamento ID ${d.medicationId} - ${d.date} ${d.time}: ${d.status}${d.notes ? ' - ' + d.notes : ''}`).join('\n')}
+`;
     }
 
-    // Respostas sobre medicamentos
-    if (message.includes('medicamento') || message.includes('remédio') || message.includes('prescrição')) {
+    // Tentar usar a API Gemini
+    const geminiPrompt = `Você é um assistente de IA especializado em farmácia e saúde do sistema Health Sharp. Você tem acesso completo aos dados do paciente e deve responder de forma profissional, clara e útil.
+
+${patientContext}
+
+Pergunta do usuário: ${userMessage}
+
+INSTRUÇÕES:
+- Responda de forma RESUMIDA e CONCISA (máximo 200 palavras)
+- Para dados do paciente: apenas informações essenciais (nome, idade, condições principais, alergias)
+- Para medicamentos: apenas os ativos mais importantes
+- Para histórico: apenas os 2-3 atendimentos mais recentes
+- Use emojis para organizar a informação
+- Evite textos longos e repetitivos
+- Seja direto e objetivo
+
+Responda agora:`;
+
+    const geminiResponse = await callGeminiAPI(geminiPrompt);
+    if (geminiResponse) {
+      return geminiResponse;
+    }
+
+    // Fallback para respostas locais se a API falhar
+    const message = userMessage.toLowerCase();
+
+    if (message.includes('dados') || message.includes('informações') || message.includes('paciente')) {
       if (patient) {
-        const medications = mockMedications.filter(m => m.patientId === patient.id);
-        const activeMeds = medications.filter(m => m.status === 'active');
-        
-        return `**Medicamentos de ${patient.name}:**\n\n${activeMeds.map(med => 
-          `• **${med.name}** ${med.dosage}\n  - Frequência: ${med.frequency}\n  - Prescrito por: ${med.prescribedBy}`
-        ).join('\n\n')}\n\n${medications.some(m => m.interactions) ? 
-          '⚠️ **Atenção:** Há medicamentos com possíveis interações. Verifique na aba Medicamentos.' : 
-          '✅ Não foram identificadas interações medicamentosas.'
-        }`;
+        const activeMeds = mockMedications.filter(m => m.patientId === patient.id && m.status === 'active').length;
+        return `📋 **${patient.name}** (${patient.age} anos)\n\n🏥 **Condições:** ${patient.conditions.slice(0, 3).join(', ')}\n⚠️ **Alergias:** ${patient.allergies.length > 0 ? patient.allergies.join(', ') : 'Nenhuma'}\n💊 **Medicamentos ativos:** ${activeMeds}\n📞 **Contato:** ${patient.phone}`;
       }
-      return 'Para consultar medicamentos, informe o CPF do paciente ou selecione um paciente no prontuário.';
+      return 'Nenhum paciente selecionado. Selecione um paciente no prontuário para ver os dados.';
     }
 
-    // Respostas sobre histórico
-    if (message.includes('histórico') || message.includes('atendimento') || message.includes('consulta')) {
-      if (patient) {
-        const appointments = mockAppointments.filter(a => a.patientId === patient.id);
-        const recent = appointments.slice(0, 3);
-        
-        return `**Histórico de ${patient.name}:**\n\n${recent.map(apt => 
-          `• **${apt.type}** - ${apt.date}\n  ${apt.notes.substring(0, 100)}...`
-        ).join('\n\n')}\n\n📊 Total de atendimentos: ${appointments.length}`;
-      }
-      return 'Para consultar o histórico, informe o CPF do paciente.';
-    }
-
-    // Respostas sobre vendas
-    if (message.includes('venda') || message.includes('compra') || message.includes('produto')) {
-      if (patient) {
-        const sales = mockSales.filter(s => s.patientCpf === patient.cpf);
-        const totalSpent = sales.reduce((sum, sale) => sum + sale.totalAmount, 0);
-        
-        return `**Histórico de Vendas - ${patient.name}:**\n\n${sales.map(sale => 
-          `• **${sale.date}** - R$ ${sale.totalAmount.toFixed(2)}\n  ${sale.products.map(p => p.name).join(', ')}`
-        ).join('\n\n')}\n\n💰 **Total gasto:** R$ ${totalSpent.toFixed(2)}\n📦 **Total de compras:** ${sales.length}`;
-      }
-      return 'Para consultar vendas, informe o CPF do paciente.';
-    }
-
-    // Respostas sobre alergias
-    if (message.includes('alergia') || message.includes('alérgico')) {
-      if (patient) {
-        return patient.allergies.length > 0 
-          ? `⚠️ **Alergias de ${patient.name}:**\n${patient.allergies.map(a => `• ${a}`).join('\n')}\n\n**Importante:** Sempre verificar antes de dispensar medicamentos!`
-          : `✅ ${patient.name} não possui alergias registradas.`;
-      }
-      return 'Para consultar alergias, informe o CPF do paciente.';
-    }
-
-    // Respostas sobre condições de saúde
-    if (message.includes('condição') || message.includes('doença') || message.includes('problema')) {
-      if (patient) {
-        return `**Condições de Saúde - ${patient.name}:**\n${patient.conditions.map(c => `• ${c}`).join('\n')}\n\n📋 Essas informações são importantes para orientações farmacêuticas adequadas.`;
-      }
-      return 'Para consultar condições de saúde, informe o CPF do paciente.';
-    }
-
-    // Respostas sobre interações
-    if (message.includes('interação') || message.includes('compatível')) {
+    if (message.includes('medicamento') || message.includes('remédio')) {
       if (patient) {
         const medications = mockMedications.filter(m => m.patientId === patient.id && m.status === 'active');
-        const withInteractions = medications.filter(m => m.interactions);
-        
-        if (withInteractions.length > 0) {
-          return `⚠️ **Possíveis Interações - ${patient.name}:**\n\n${withInteractions.map(med => 
-            `• **${med.name}**\n  ${med.interactions}`
-          ).join('\n\n')}\n\n**Recomendação:** Monitorar sinais vitais e orientar o paciente.`;
+        if (medications.length > 0) {
+          return `💊 **Medicamentos de ${patient.name}:**\n\n${medications.map(med => 
+            `• **${med.name}** ${med.dosage}\n  Frequência: ${med.frequency}\n  Prescrito por: ${med.prescribedBy}`
+          ).join('\n\n')}`;
         }
-        return `✅ Não foram identificadas interações medicamentosas para ${patient.name}.`;
+        return `${patient.name} não possui medicamentos ativos no momento.`;
       }
-      return 'Para verificar interações, informe o CPF do paciente.';
+      return 'Selecione um paciente para consultar medicamentos.';
     }
 
-    // Resposta padrão
-    return '**Health Sharp AI Assistant** \n*Powered by Amazon Nova Premier v1:0*\n\nPosso ajudar com:\n• Histórico de atendimentos\n• Medicamentos e interações\n• Histórico de vendas\n• Alergias e condições de saúde\n\nInforme o CPF do paciente ou faça uma pergunta específica.';
+    if (patient) {
+      return `Olá! 😊 Estou aqui para ajudar com informações sobre **${patient.name}**.\n\nPosso responder sobre:\n• Dados do paciente\n• Medicamentos atuais\n• Histórico de atendimentos\n• Alergias e condições\n\nO que você gostaria de saber?`;
+    }
+    
+    return 'Olá! 😊 Sou seu assistente de IA farmacêutico powered by Gemini.\n\nPara começar, selecione um paciente no prontuário e depois faça perguntas!';
   };
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -205,6 +179,7 @@ Pergunta: ${userMessage}`
     setMessages(prev => [...prev, userMessage]);
     const currentInput = inputValue;
     setInputValue('');
+    setIsLoading(true);
 
     try {
       const aiResponseContent = await generateAIResponse(currentInput);
@@ -216,13 +191,16 @@ Pergunta: ${userMessage}`
       };
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
-      const errorResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'ai',
-        content: 'Desculpe, ocorreu um erro ao processar sua mensagem.',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorResponse]);
+      console.error('Erro:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
   };
 
@@ -231,10 +209,7 @@ Pergunta: ${userMessage}`
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center gap-2">
           <Bot className="w-5 h-5 text-blue-600" />
-          <div>
-            <h3 className="font-semibold">Health Sharp AI</h3>
-            <p className="text-xs text-gray-500">Amazon Nova Premier v1:0</p>
-          </div>
+          <h3 className="font-semibold">Assistente IA</h3>
         </div>
         <Button variant="ghost" size="sm" onClick={onClose}>
           <X className="w-4 h-4" />
@@ -253,7 +228,6 @@ Pergunta: ${userMessage}`
                   <Bot className="w-4 h-4 text-blue-600" />
                 </div>
               )}
-              
               <div
                 className={`max-w-[80%] p-3 rounded-lg ${
                   message.type === 'user'
@@ -261,41 +235,22 @@ Pergunta: ${userMessage}`
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
-                <div className="whitespace-pre-wrap text-sm">
-                  {message.content}
-                </div>
-                <div className={`text-xs mt-1 ${
-                  message.type === 'user' ? 'text-blue-100' : 'text-gray-500'
-                }`}>
-                  {message.timestamp.toLocaleTimeString('pt-BR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                  })}
-                </div>
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               </div>
-
               {message.type === 'user' && (
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
                   <User className="w-4 h-4 text-gray-600" />
                 </div>
               )}
             </div>
           ))}
-          
           {isLoading && (
             <div className="flex gap-3 justify-start">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                 <Bot className="w-4 h-4 text-blue-600" />
               </div>
-              <div className="bg-gray-100 text-gray-900 p-3 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <div className="animate-pulse flex space-x-1">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                  </div>
-                  <span className="text-xs text-gray-500">Digitando...</span>
-                </div>
+              <div className="bg-gray-100 p-3 rounded-lg">
+                <p className="text-sm text-gray-600">Digitando...</p>
               </div>
             </div>
           )}
@@ -305,12 +260,17 @@ Pergunta: ${userMessage}`
       <div className="p-4 border-t">
         <div className="flex gap-2">
           <Input
-            placeholder="Digite sua pergunta..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+            onKeyPress={handleKeyPress}
+            placeholder="Digite sua mensagem..."
+            disabled={isLoading}
           />
-          <Button onClick={handleSendMessage} size="sm" disabled={isLoading}>
+          <Button 
+            onClick={handleSendMessage} 
+            disabled={isLoading || !inputValue.trim()}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
             <Send className="w-4 h-4" />
           </Button>
         </div>
