@@ -24,80 +24,77 @@ export function Reports() {
   ];
 
   const adherenceData = [
-    { name: 'Alta Adesão', value: 65, color: '#2563eb' },
-    { name: 'Média Adesão', value: 25, color: '#eab308' },
-    { name: 'Baixa Adesão', value: 10, color: '#dc2626' },
+    { name: 'Alta adesão', value: 65, color: '#2563eb' },
+    { name: 'Média adesão', value: 25, color: '#eab308' },
+    { name: 'Baixa adesão', value: 10, color: '#dc2626' },
   ];
 
   return (
-    <div className="h-screen overflow-auto p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-gray-900 mb-2">Relatórios e Análises</h1>
-          <p className="text-gray-600">Indicadores de desempenho do serviço clínico</p>
+          <h1 className="text-gray-900 font-semibold">Relatórios e análises</h1>
+          <p className="text-sm text-gray-600">Indicadores de desempenho do serviço clínico</p>
         </div>
-        
-        <Button className="bg-blue-600 hover:bg-blue-700">
-          <Download className="w-4 h-4 mr-2" />
-          Exportar Relatórios
+
+        <Button className="bg-blue-600 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-blue-700">
+          <Download className="mr-2 h-4 w-4" />
+          Exportar relatórios
         </Button>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-blue-600" />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+        {[
+          {
+            title: 'Total de atendimentos',
+            value: '1.184',
+            subtitle: '+12% vs mês anterior',
+            icon: <Calendar className="h-5 w-5 text-blue-600" />,
+            accent: 'bg-blue-50',
+          },
+          {
+            title: 'Pacientes ativos',
+            value: '487',
+            subtitle: '+8% vs mês anterior',
+            icon: <Users className="h-5 w-5 text-blue-600" />,
+            accent: 'bg-blue-50',
+          },
+          {
+            title: 'Taxa de adesão',
+            value: '87%',
+            subtitle: '+3% vs mês anterior',
+            icon: <TrendingUp className="h-5 w-5 text-purple-600" />,
+            accent: 'bg-purple-50',
+          },
+          {
+            title: 'Média por dia',
+            value: '42',
+            subtitle: '+15% vs mês anterior',
+            icon: <Calendar className="h-5 w-5 text-orange-600" />,
+            accent: 'bg-orange-50',
+          },
+        ].map((card, index) => (
+          <Card
+            key={card.title}
+            className="animate-scale-in p-6 shadow-sm"
+            style={{ animationDelay: `${index * 0.05}s` }}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${card.accent}`}>
+                {card.icon}
+              </div>
+              <TrendingUp className="h-5 w-5 text-blue-600" />
             </div>
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-          </div>
-          <h3 className="text-gray-900">1,184</h3>
-          <p className="text-gray-600 text-sm">Total de Atendimentos</p>
-          <p className="text-blue-600 text-xs mt-1">+12% vs mês anterior</p>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-600" />
-            </div>
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-          </div>
-          <h3 className="text-gray-900">487</h3>
-          <p className="text-gray-600 text-sm">Pacientes Ativos</p>
-          <p className="text-blue-600 text-xs mt-1">+8% vs mês anterior</p>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-            </div>
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-          </div>
-          <h3 className="text-gray-900">87%</h3>
-          <p className="text-gray-600 text-sm">Taxa de Adesão</p>
-          <p className="text-blue-600 text-xs mt-1">+3% vs mês anterior</p>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-orange-600" />
-            </div>
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-          </div>
-          <h3 className="text-gray-900">42</h3>
-          <p className="text-gray-600 text-sm">Média por Dia</p>
-          <p className="text-blue-600 text-xs mt-1">+15% vs mês anterior</p>
-        </Card>
+            <h3 className="text-2xl font-semibold text-gray-900">{card.value}</h3>
+            <p className="text-sm text-gray-600">{card.title}</p>
+            <p className="mt-1 text-xs text-blue-600">{card.subtitle}</p>
+          </Card>
+        ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card className="p-6">
-          <h3 className="text-gray-900 mb-6">Atendimentos por Tipo</h3>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="animate-fade-in-up p-6" style={{ animationDelay: '0.05s' }}>
+          <h3 className="mb-4 text-gray-900">Atendimentos por tipo</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={appointmentsByType}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -110,8 +107,8 @@ export function Reports() {
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="text-gray-900 mb-6">Tendência Mensal</h3>
+        <Card className="animate-fade-in-up p-6" style={{ animationDelay: '0.1s' }}>
+          <h3 className="mb-4 text-gray-900">Tendência mensal</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={monthlyTrend}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -125,9 +122,9 @@ export function Reports() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <h3 className="text-gray-900 mb-6">Taxa de Adesão ao Tratamento</h3>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <Card className="animate-fade-in-up p-6" style={{ animationDelay: '0.15s' }}>
+          <h3 className="mb-4 text-gray-900">Taxa de adesão ao tratamento</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -136,8 +133,7 @@ export function Reports() {
                 cy="50%"
                 labelLine={false}
                 label={({ name, value }) => `${name}: ${value}%`}
-                outerRadius={100}
-                fill="#8884d8"
+                outerRadius={110}
                 dataKey="value"
               >
                 {adherenceData.map((entry, index) => (
@@ -149,49 +145,47 @@ export function Reports() {
           </ResponsiveContainer>
         </Card>
 
-        <Card className="p-6">
-          <h3 className="text-gray-900 mb-4">Principais Indicadores</h3>
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-blue-900">Satisfação dos Pacientes</span>
-                <span className="text-blue-700">4.8/5.0</span>
+        <Card className="animate-fade-in-up space-y-4 p-6" style={{ animationDelay: '0.2s' }}>
+          <h3 className="text-gray-900">Principais indicadores</h3>
+          {[{
+            title: 'Satisfação dos pacientes',
+            value: '4.8/5.0',
+            color: 'bg-blue-600',
+            base: 'bg-blue-200',
+            width: '96%',
+            accent: 'text-blue-900',
+          }, {
+            title: 'Tempo médio de atendimento',
+            value: '18 min',
+            color: 'bg-blue-600',
+            base: 'bg-blue-200',
+            width: '75%',
+            accent: 'text-blue-900',
+          }, {
+            title: 'Resolutividade',
+            value: '92%',
+            color: 'bg-purple-600',
+            base: 'bg-purple-200',
+            width: '92%',
+            accent: 'text-purple-900',
+          }, {
+            title: 'Taxa de retorno',
+            value: '78%',
+            color: 'bg-orange-600',
+            base: 'bg-orange-200',
+            width: '78%',
+            accent: 'text-orange-900',
+          }].map((indicator) => (
+            <div key={indicator.title} className="space-y-2 rounded-lg bg-blue-50 p-4">
+              <div className="flex items-center justify-between">
+                <span className={indicator.accent}>{indicator.title}</span>
+                <span className="text-sm text-blue-700">{indicator.value}</span>
               </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '96%' }}></div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-blue-900">Tempo Médio de Atendimento</span>
-                <span className="text-blue-700">18 min</span>
-              </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-purple-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-purple-900">Resolutividade</span>
-                <span className="text-purple-700">92%</span>
-              </div>
-              <div className="w-full bg-purple-200 rounded-full h-2">
-                <div className="bg-purple-600 h-2 rounded-full" style={{ width: '92%' }}></div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-orange-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-orange-900">Taxa de Retorno</span>
-                <span className="text-orange-700">78%</span>
-              </div>
-              <div className="w-full bg-orange-200 rounded-full h-2">
-                <div className="bg-orange-600 h-2 rounded-full" style={{ width: '78%' }}></div>
+              <div className={`h-2 w-full rounded-full ${indicator.base}`}>
+                <div className={`h-2 rounded-full ${indicator.color}`} style={{ width: indicator.width }} />
               </div>
             </div>
-          </div>
+          ))}
         </Card>
       </div>
     </div>

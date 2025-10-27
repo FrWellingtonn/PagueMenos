@@ -1,0 +1,15 @@
+{
+  "name": "sngpc-upload",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Importador de arquivos CSV para MongoDB Atlas",
+  "type": "module",
+  "scripts": {
+    "start": "node import.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "csv-parser": "^3.0.0",
+    "mongodb": "^6.2.0"
+  }
+}

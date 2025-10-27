@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState } from 'react';
 import { Card } from './ui/card';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
@@ -48,7 +48,7 @@ export function DSF() {
         <div class="print-title">LAUDO FARMACÊUTICO</div>
         <div class="print-subtitle">Dispensação Sem Formulação (DSF)</div>
         <div style="font-size: 11px; margin-top: 10px;">
-          Health Sharp - Sistema Clínico<br>
+          <strong>Health Sharp</strong> - Sistema Clínico<br>
           Data: ${new Date().toLocaleDateString('pt-BR')}
         </div>
       </div>
@@ -116,7 +116,7 @@ export function DSF() {
       </div>
       
       <div class="print-footer">
-        Este laudo foi gerado pelo Health Sharp
+        Este laudo foi gerado pelo <strong>Health Sharp</strong>
       </div>
     `;
     
@@ -139,8 +139,8 @@ export function DSF() {
   };
 
   return (
-    <div className="h-screen overflow-auto p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-gray-900 mb-2">Dispensação Sem Formulação (DSF)</h1>
           <p className="text-gray-600">Sistema de laudo para dispensação assistida</p>
@@ -150,14 +150,14 @@ export function DSF() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <Card className="animate-scale-in space-y-4 rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-sm backdrop-blur-sm">
           <h3 className="text-gray-900 mb-4">Dados do Laudo</h3>
 
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="cpf">Buscar CPF</Label>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <Input
                   id="cpf"
                   placeholder="000.000.000-00"
@@ -165,7 +165,7 @@ export function DSF() {
                   onChange={(e) => setCpf(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSearchCpf(); }}
                 />
-                <Button variant="outline" onClick={handleSearchCpf}>Buscar</Button>
+                <Button variant="outline" onClick={handleSearchCpf} className="transition-transform duration-200 hover:-translate-y-0.5">Buscar</Button>
               </div>
               {selectedPatient ? (
                 <p className="text-sm text-gray-600">Selecionado: {selectedPatient.name}</p>
@@ -205,14 +205,17 @@ export function DSF() {
               <Textarea id="contraindications" value={contraindications} onChange={(e) => setContraindications(e.target.value)} placeholder="Liste contraindicações observadas e precauções" />
             </div>
 
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={handleClear}>Limpar</Button>
-              <Button onClick={handleGenerate}>Gerar Laudo</Button>
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+              <Button variant="outline" onClick={handleClear} className="transition-transform duration-200 hover:-translate-y-0.5">Limpar</Button>
+              <Button onClick={handleGenerate} className="transition-transform duration-200 hover:-translate-y-0.5">Gerar Laudo</Button>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card
+          className="animate-scale-in space-y-4 rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-sm"
+          style={{ animationDelay: '0.1s' }}
+        >
           <h3 className="text-gray-900 mb-4">Pré-visualização</h3>
           {showPreview ? (
             <div className="space-y-4 text-sm">
@@ -259,3 +262,4 @@ export function DSF() {
     </div>
   );
 }
+

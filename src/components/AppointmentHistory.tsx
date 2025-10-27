@@ -18,91 +18,92 @@ export function AppointmentHistory() {
   });
 
   return (
-    <div className={`h-screen overflow-auto p-8 ${showAIChat ? 'pr-4' : ''}`}>
-      <div className="flex gap-6">
-        <div className={showAIChat ? 'flex-1' : 'w-full'}>
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h1 className="text-gray-900 mb-2">Histórico de Atendimentos</h1>
-              <p className="text-gray-600">Visualize todos os atendimentos realizados</p>
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 lg:flex-row">
+      <div className={`flex-1 space-y-6 ${showAIChat ? 'lg:pr-6' : ''}`}>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-gray-900 font-semibold">Histórico de Atendimentos</h1>
+            <p className="text-sm text-gray-600">Visualize todos os atendimentos realizados</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowAIChat(!showAIChat)}
+            className="transition-transform duration-200 hover:-translate-y-0.5"
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            Nenna
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <Card className="animate-scale-in p-4 md:col-span-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
+              <Input
+                placeholder="Buscar por paciente ou tipo de atendimento..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
             </div>
-            <Button 
-              variant="outline"
-              onClick={() => setShowAIChat(!showAIChat)}
-            >
-              <Bot className="w-4 h-4 mr-2" />
-              Modo IA
-            </Button>
-          </div>
+          </Card>
 
-      {/* Search and Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="p-4 md:col-span-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              placeholder="Buscar por paciente ou tipo de atendimento..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </Card>
+          <Card className="animate-scale-in p-4">
+            <div className="flex items-center gap-2">
+              <Filter className="h-5 w-5 text-gray-400" />
+              <Input type="date" defaultValue="2025-10-18" />
+            </div>
+          </Card>
+        </div>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-400" />
-            <Input type="date" defaultValue="2025-10-18" />
-          </div>
-        </Card>
-      </div>
+        <div className="space-y-4">
+          {filteredAppointments.map((appointment, index) => {
+            const patient = mockPatients.find(p => p.id === appointment.patientId);
 
-      {/* Appointments List */}
-      <div className="space-y-4">
-        {filteredAppointments.map((appointment) => {
-          const patient = mockPatients.find(p => p.id === appointment.patientId);
-          
-          return (
-            <Card key={appointment.id} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-blue-700">{patient?.name.charAt(0)}</span>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-gray-900 mb-1">{patient?.name}</h3>
-                    <p className="text-gray-600 text-sm mb-2">{appointment.type}</p>
-                    <div className="flex items-center gap-2 text-gray-500 text-sm">
-                      <Calendar className="w-4 h-4" />
-                      <span>{appointment.date} às {appointment.time}</span>
+            return (
+              <Card
+                key={appointment.id}
+                className="animate-fade-in-up p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                style={{ animationDelay: `${index * 0.04}s` }}
+              >
+                <div className="mb-4 flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-700">
+                      <span>{patient?.name.charAt(0)}</span>
+                    </div>
+
+                    <div>
+                      <h3 className="font-medium text-gray-900">{patient?.name}</h3>
+                      <p className="mb-2 text-sm text-gray-600">{appointment.type}</p>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Calendar className="h-4 w-4" />
+                        <span>{appointment.date} às {appointment.time}</span>
+                      </div>
                     </div>
                   </div>
+
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge variant={appointment.priority === 'urgent' ? 'destructive' : 'outline'}>
+                      {appointment.priority === 'urgent' ? 'Urgente' : 'Normal'}
+                    </Badge>
+                    <span className="text-sm text-gray-500">{appointment.pharmacist}</span>
+                  </div>
                 </div>
 
-                <div className="flex flex-col items-end gap-2">
-                  <Badge variant={appointment.priority === 'urgent' ? 'destructive' : 'outline'}>
-                    {appointment.priority === 'urgent' ? 'Urgente' : 'Normal'}
-                  </Badge>
-                  <span className="text-sm text-gray-500">{appointment.pharmacist}</span>
+                <div className="pl-16">
+                  <p className="text-gray-700">{appointment.notes}</p>
                 </div>
-              </div>
-
-              <div className="pl-16">
-                <p className="text-gray-700">{appointment.notes}</p>
-              </div>
-            </Card>
-          );
-        })}
-          </div>
+              </Card>
+            );
+          })}
         </div>
-        
-        {showAIChat && (
-          <div className="w-96 h-[calc(100vh-8rem)]">
-            <AIChat onClose={() => setShowAIChat(false)} />
-          </div>
-        )}
       </div>
+
+      {showAIChat && (
+        <div className="animate-scale-in w-full max-w-full rounded-2xl border border-gray-100 bg-white/90 p-4 shadow-sm backdrop-blur-sm lg:w-80 xl:w-96">
+          <AIChat onClose={() => setShowAIChat(false)} />
+        </div>
+      )}
     </div>
   );
 }

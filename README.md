@@ -5,7 +5,16 @@
 
   ## Running the code
 
-  Run `npm i` to install the dependencies.
+Run `yarn install` to install the dependencies.
 
-  Run `npm run dev` to start the development server.
-  
+Run `yarn dev` to start the development server.
+
+## Environment variables
+
+Create a `.env` file at the project root with the MongoDB connection string:
+
+```
+MONGODB_URI=mongodb+srv://gabdrawed14:J1LfYpHwU1AiXb46@cluster.l2uj7a8.mongodb.net/?appName=cluster
+```
+
+Make sure this environment variable is available to whichever runtime executes `src/lambda/mongoClient.ts`.

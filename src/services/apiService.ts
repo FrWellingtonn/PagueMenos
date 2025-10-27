@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://xzyrgf6hy7oxnukqbedda5xblq0omzrx.lambda-url.us-east-2.on.aws';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL as string | undefined;
 
 export interface ApiResponse<T = any> {
   data?: T;
@@ -11,7 +11,15 @@ export async function apiRequest<T = any>(
   method: string = 'GET',
   body?: any
 ): Promise<ApiResponse<T>> {
-  const url = `${API_BASE_URL}${endpoint ? `/${endpoint}` : ''}`;
+  if (!API_BASE_URL) {
+    return {
+      error: 'API base URL não configurada. Defina VITE_API_BASE_URL no seu .env',
+      status: 500,
+    };
+  }
+
+  const base = API_BASE_URL.replace(/\/+$/g, '');
+  const url = `${base}${endpoint ? `/${endpoint}` : ''}`;
   
   const headers: HeadersInit = {
     'Content-Type': 'application/json',

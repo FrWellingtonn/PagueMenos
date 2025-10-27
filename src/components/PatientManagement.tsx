@@ -21,76 +21,75 @@ export function PatientManagement({ onPatientSelect }: PatientManagementProps) {
   );
 
   return (
-    <div className="h-screen overflow-auto p-8">
-      <div className="flex items-center justify-between mb-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-gray-900 mb-2">Gestão de Pacientes</h1>
-          <p className="text-gray-600">Cadastro e busca de pacientes</p>
+          <h1 className="text-gray-900 font-semibold">Gestão de Pacientes</h1>
+          <p className="text-sm text-gray-600">Cadastro e busca de pacientes</p>
         </div>
-        
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
+            <Button className="bg-blue-600 transition-transform duration-200 hover:-translate-y-0.5 hover:bg-blue-700">
+              <Plus className="mr-2 h-4 w-4" />
               Novo Paciente
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-full max-w-md sm:max-w-lg md:max-w-2xl lg:max-w-3xl">
+          <DialogContent className="w-full max-w-3xl">
             <DialogHeader>
-              <DialogTitle>Cadastrar Novo Paciente</DialogTitle>
+              <DialogTitle>Cadastrar novo paciente</DialogTitle>
             </DialogHeader>
-            <div className="w-full max-w-2xl mx-auto">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome Completo</Label>
-                <Input id="name" placeholder="Digite o nome completo" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cpf">CPF</Label>
-                <Input id="cpf" placeholder="000.000.000-00" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="birthdate">Data de Nascimento</Label>
-                <Input id="birthdate" type="date" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="gender">Sexo</Label>
-                <Input id="gender" placeholder="Masculino/Feminino" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
-                <Input id="phone" placeholder="(00) 00000-0000" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">E-mail</Label>
-                <Input id="email" type="email" placeholder="email@exemplo.com" />
-              </div>
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="address">Endereço Completo</Label>
-                <Input id="address" placeholder="Rua, número, bairro, cidade, UF" />
-              </div>
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="observations">Observações</Label>
-                <Input id="observations" placeholder="Informações adicionais" />
-              </div>
+            <div className="mx-auto w-full max-w-2xl space-y-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome completo</Label>
+                  <Input id="name" placeholder="Digite o nome completo" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cpf">CPF</Label>
+                  <Input id="cpf" placeholder="000.000.000-00" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="birthdate">Data de nascimento</Label>
+                  <Input id="birthdate" type="date" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Sexo</Label>
+                  <Input id="gender" placeholder="Masculino/Feminino" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Telefone</Label>
+                  <Input id="phone" placeholder="(00) 00000-0000" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">E-mail</Label>
+                  <Input id="email" type="email" placeholder="email@exemplo.com" />
+                </div>
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="address">Endereço completo</Label>
+                  <Input id="address" placeholder="Rua, número, bairro, cidade, UF" />
+                </div>
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="observations">Observações</Label>
+                  <Input id="observations" placeholder="Informações adicionais" />
+                </div>
               </div>
               <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancelar
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsDialogOpen(false)}>
-                Cadastrar Paciente
-              </Button>
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsDialogOpen(false)}>
+                  Cadastrar paciente
+                </Button>
               </div>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Search Bar */}
-      <Card className="p-4 mb-6">
+      <Card className="animate-scale-in p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
           <Input
             placeholder="Buscar por nome ou CPF..."
             value={searchTerm}
@@ -100,36 +99,42 @@ export function PatientManagement({ onPatientSelect }: PatientManagementProps) {
         </div>
       </Card>
 
-      {/* Patients List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filteredPatients.map((patient) => (
-          <Card key={patient.id} className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onPatientSelect(patient.id)}>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {filteredPatients.map((patient, index) => (
+          <Card
+            key={patient.id}
+            className="animate-fade-in-up cursor-pointer p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+            style={{ animationDelay: `${index * 0.04}s` }}
+            onClick={() => onPatientSelect(patient.id)}
+          >
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-700 text-xl">{patient.name.charAt(0)}</span>
+              <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-xl text-blue-700">
+                <span>{patient.name.charAt(0)}</span>
               </div>
-              
-              <div className="flex-1">
-                <h3 className="text-gray-900 mb-1">{patient.name}</h3>
-                <p className="text-gray-600 text-sm mb-3">
-                  {patient.age} anos • {patient.gender} • CPF: {patient.cpf}
-                </p>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-gray-600 text-sm">
-                    <Phone className="w-4 h-4" />
+
+              <div className="flex-1 space-y-2">
+                <div>
+                  <h3 className="text-gray-900 font-medium">{patient.name}</h3>
+                  <p className="text-sm text-gray-600">
+                    {patient.age} anos • {patient.gender} • CPF: {patient.cpf}
+                  </p>
+                </div>
+
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
                     <span>{patient.phone}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600 text-sm">
-                    <Mail className="w-4 h-4" />
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
                     <span>{patient.email}</span>
                   </div>
                 </div>
 
                 {patient.allergies.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 text-xs">
                     {patient.allergies.map((allergy, index) => (
-                      <span key={index} className="px-2 py-1 bg-red-50 text-red-700 text-xs rounded">
+                      <span key={index} className="rounded bg-red-50 px-2 py-1 text-red-700">
                         Alergia: {allergy}
                       </span>
                     ))}
@@ -137,14 +142,14 @@ export function PatientManagement({ onPatientSelect }: PatientManagementProps) {
                 )}
 
                 {patient.conditions.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 text-xs">
                     {patient.conditions.slice(0, 2).map((condition, index) => (
-                      <span key={index} className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded">
+                      <span key={index} className="rounded bg-blue-50 px-2 py-1 text-blue-700">
                         {condition}
                       </span>
                     ))}
                     {patient.conditions.length > 2 && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                      <span className="rounded bg-gray-100 px-2 py-1 text-gray-700">
                         +{patient.conditions.length - 2}
                       </span>
                     )}

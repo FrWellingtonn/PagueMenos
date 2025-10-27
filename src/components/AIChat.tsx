@@ -2,14 +2,27 @@ import { useState } from 'react';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { ScrollArea } from './ui/scroll-area';
 import { Send, Bot, User, X } from 'lucide-react';
 import { mockPatients, mockAppointments, mockMedications, mockSales, mockTeleconsultations, mockExams, mockMedicationDoses } from '../data/mockData';
+import { searchMedication } from '../services/sngpcService';
+
+// TODO: Replace with actual authentication context
+const getCurrentPharmacist = () => {
+  // This should be replaced with actual authentication context
+  return 'Farmacêutico Responsável'; // Default fallback
+};
 
 // Simulação da API Gemini (substitua pela real quando instalar @google/genai)
 const callGeminiAPI = async (prompt: string): Promise<string> => {
   try {
-    const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyCKbOq-ySqQoz4XCE-HU7NyL3hI6MmHR0M', {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY as string | undefined;
+    if (!apiKey) {
+      console.warn('VITE_GEMINI_API_KEY não configurada. Pulei chamada à API Gemini.');
+      return '';
+    }
+
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -50,7 +63,9 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
     {
       id: '1',
       type: 'ai',
-      content: patientCpf ? `Olá! 😊 Estou aqui para ajudar com informações do paciente selecionado. Pergunte sobre dados, medicamentos, histórico ou alergias.` : 'Olá! 😊 Sou seu assistente de IA farmacêutico powered by Gemini. Selecione um paciente no prontuário para começar.',
+      content: patientCpf 
+        ? `Olá ${getCurrentPharmacist()}, estou aqui para auxiliar com as informações do paciente selecionado. Como posso ajudar?` 
+        : `Olá ${getCurrentPharmacist()}, sou seu assistente de IA farmacêutico. Por favor, selecione um paciente no prontuário para começarmos.`,
       timestamp: new Date()
     }
   ]);
@@ -58,6 +73,47 @@ export function AIChat({ patientCpf, onClose }: AIChatProps) {
   const [inputValue, setInputValue] = useState('');
 
   const generateAIResponse = async (userMessage: string): Promise<string> => {
+    // Check if user is asking about medication information
+    const medicationQuery = userMessage.match(/sobre o medicamento (.*?)[.?!]/i) || 
+                          userMessage.match(/informações do medicamento (.*?)[.?!]/i) ||
+                          userMessage.match(/detalhes do medicamento (.*?)[.?!]/i);
+
+    if (medicationQuery && medicationQuery[1]) {
+      const medName = medicationQuery[1].trim();
+      const sngpcResults = await searchMedication(medName);
+      
+      if (sngpcResults.length > 0) {
+        const medInfo = sngpcResults[0];
+        const patient = patientCpf ? mockPatients.find(p => p.cpf === patientCpf) : null;
+        const patientName = patient ? patient.name : 'Paciente';
+        
+        let response = `**Informações do Medicamento**\n\n`;
+        
+        // Add available fields from SNGPC data
+        if (medInfo.nome) response += `**Medicamento:** ${medInfo.nome}\n`;
+        if (medInfo.principioAtivo) response += `**Princípio Ativo:** ${medInfo.principioAtivo}\n`;
+        if (medInfo.apresentacao) response += `**Apresentação:** ${medInfo.apresentacao}\n`;
+        if (medInfo.laboratorio) response += `**Laboratório:** ${medInfo.laboratorio}\n`;
+        if (medInfo.tarja) response += `**Classificação:** ${medInfo.tarja}\n`;
+        
+        response += `\n*Fonte: Sistema Nacional de Gerenciamento de Produtos Controlados (SNGPC)*`;
+        
+        if (patient) {
+          response += `\n\n**Atenção ${getCurrentPharmacist()}:**`;
+          if (patient.allergies && patient.allergies.length > 0) {
+            response += `\n- Verifique se ${patientName.split(' ')[0]} possui alergia a este medicamento.`;
+          }
+          if (patient.conditions && patient.conditions.length > 0) {
+            response += `\n- Considere as condições de saúde do paciente: ${patient.conditions.join(', ')}.`;
+          }
+        }
+        
+        return response;
+      } else {
+        return `Não encontrei informações sobre o medicamento "${medName}" no sistema SNGPC.`;
+      }
+    }
+
     // Buscar paciente
     let patient = null;
     if (patientCpf) {
@@ -205,76 +261,67 @@ Responda agora:`;
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-2">
-          <Bot className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold">Assistente IA</h3>
-        </div>
-        <Button variant="ghost" size="sm" onClick={onClose}>
-          <X className="w-4 h-4" />
+    <>
+      {/* Header */}
+      <div className="flex items-center justify-between h-12 px-4 sticky top-0 z-10 backdrop-blur-md bg-white/70 dark:bg-[#1C1C1E]/70 border-b rounded-tl-2xl lg:rounded-tl-none">
+        <h3 className="font-semibold text-sm">Assistente Farmacêutico</h3>
+        <Button variant="ghost" size="sm" aria-label="Fechar chat" className="text-foreground hover:bg-accent h-8 w-8 p-0 rounded-full" onClick={onClose}>
+          <X className="h-4 w-4" />
         </Button>
       </div>
-
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              {message.type === 'ai' && (
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-blue-600" />
+      
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+        {messages.map((message) => (
+          <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className="max-w-[85%]">
+              <div className={`rounded-2xl p-2.5 text-xs ${
+                message.type === 'user'
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 text-gray-800'
+              }`}>
+                <div className="flex items-start gap-2">
+                  {message.type === 'ai' && <Bot className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />}
+                  <div className="whitespace-pre-wrap break-words">{message.content}</div>
+                  {message.type === 'user' && <User className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />}
                 </div>
-              )}
-              <div
-                className={`max-w-[80%] p-3 rounded-lg ${
-                  message.type === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-900'
-                }`}
-              >
-                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               </div>
-              {message.type === 'user' && (
-                <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-gray-600" />
-                </div>
-              )}
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Bot className="w-4 h-4 text-blue-600" />
-              </div>
-              <div className="bg-gray-100 p-3 rounded-lg">
-                <p className="text-sm text-gray-600">Digitando...</p>
+              <div className={`text-[10px] mt-1 opacity-70 ${
+                message.type === 'user' ? 'text-right' : 'text-left'
+              }`}>
+                {message.timestamp.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
-          )}
-        </div>
-      </ScrollArea>
-
-      <div className="p-4 border-t">
+          </div>
+        ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-gray-100 text-gray-800 rounded-2xl p-2.5 max-w-[85%]">
+              <div className="flex items-center gap-2 text-xs">
+                <Bot className="h-3.5 w-3.5 animate-pulse" />
+                <span>Pensando...</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Input */}
+      <div className="p-3 border-t border-gray-200">
         <div className="flex gap-2">
           <Input
+            type="text"
+            placeholder="Digite sua mensagem..."
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Digite sua mensagem..."
-            disabled={isLoading}
+            aria-label="Mensagem para o assistente" className="flex-1 text-sm rounded-[10px] h-10 input-apple"
           />
-          <Button 
-            onClick={handleSendMessage} 
-            disabled={isLoading || !inputValue.trim()}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Send className="w-4 h-4" />
+          <Button onClick={handleSendMessage} disabled={isLoading} size="icon" className="h-10 w-10 rounded-apple-sm btn-apple btn-primary-apple">
+            <Send className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
-    </Card>
+    </>
   );
 }

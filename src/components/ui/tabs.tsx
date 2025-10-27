@@ -8,17 +8,16 @@ import { cn } from "./utils";
 function Tabs({
   className,
   value,
+  defaultValue,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
-  // Garante que o valor nunca seja nulo
-  const safeValue = value || '';
-  
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
       className={cn("flex flex-col gap-2", className)}
-      value={safeValue}
       {...props}
+      {...(value !== undefined ? { value } : {})}
+      {...(defaultValue !== undefined ? { defaultValue } : {})}
     />
   );
 }
